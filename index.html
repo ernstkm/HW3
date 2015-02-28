@@ -2,12 +2,64 @@
 <html>
 <head>
       <meta charset="utf-8">
-      <title>D3 Page Template</title>
-      <script type="text/javascript" src="d3/d3.v3.js"></script>
+      <title>Do longer school hours</title>
+      <script type="text/javascript" src="d3/d3.js"></script>
+      <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
+      <style type="text/css">
+      .bar {
+      width: 2px;
+      height: 75px;	/* Gets overriden by D3-assigned height below */
+      margin-right: 2px;
+      }
+      div.math{
+        background-color: red;
+      }
+      div.hours{
+        background-color: teal;
+      }
+      div.container{
+        width: 500px;
+        height:1300px;
+      }
+      </style>
   </head>
   <body>
       <script type="text/javascript">
-          // Your beautiful D3 code will go here
-      </script>
+      var w=500;
+      var h = 1200;
+      var barPadding = 1;
+
+      d3.select("body").append("p").text("Do longer school hours make better scholars?");
+      var svg = d3.select("body")
+                  .append("svg")
+                  .attr("width", w)
+                  .attr("height", h);
+
+
+      var dataset = d3.json("eduStatjson.json", function (data){
+            svg.selectAll("rect")
+              .data(dataset)
+              .enter()
+              .append("rect")
+              .attr("class", "bar")
+              .attr("class", "hours")
+              .attr("x", function (d, i){
+                return i*(w / dataset.length);
+              })
+              .attr("y", h-dataset.totHrs)
+              .attr("width", w/ dataset.length - barPadding)
+              .attr("height", function(d){
+                  return dataset.totHrs;
+              });
+
+//              .append("rect")
+  //            .attr("class", "bar")
+    //          .attr("class", "math")
+      //        .style("height", function(d) {
+        //        return d.mAvgScr + "px";
+          //      console.log("Done with math");
+          //    })
+            });
+        </script>
   </body>
 </html>
