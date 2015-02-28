@@ -7,44 +7,52 @@
       <link rel="stylesheet" type="text/css" href="stylesheet.css"/>
       <style type="text/css">
       body{
-        fill:lightgrey;
+        background-color:lightgrey;
       }
-/*      .chart rect{
-        fill:steelblue;
-      }*/
-      .mathScr rect{
-        fill:magenta;
-      }
-      .totalHrs rect{
-        fill:green;
-      }
-      .chart text{
+
+      .chart1, .chart2 text{
         fill:darkgrey;
         font:10px sans-serif;
         text-anchor: middle;
       }
+      h3, p{
+        font-family:Helvetica;
+        color:grey;
+        }
+      p{
+        font-size:8px;
+      }
       </style>
   </head>
   <body>
-    <svg class="chart"></svg>
+    <h3> <em>Flipping the classroom:<br>Do longer school hours mean better scholars?</em></h3>
+    <svg class="chart1"></svg>
+    <svg class="chart2"></svg>
+    <p> Author: Katie Ernst</p>
+    <p> Data Source:U.S. Government National Center for Educational Statistics <a href="http://nces.ed.gov/programs/digest/d12/tables/dt12_460.asp">Average fourth--‐grade scores and annual instructional time in mathematics and science, by country or other education system: 2011</a> </p>
+    <p> Trends in International Mathematics and Science Study (TIMSS) scores are reported on a scale from 0 to 1,000, with the scale average set at 500 and the standard deviation set at 100.</p>
       <script type="text/javascript">
       var width=500;
       var height = 600;
       var barPadding = 1;
 
+      var x = d3.scale.ordinal()
+        .rangeRoundBands([0,width],.1);
+
       var y = d3.scale.linear()
         .range([height,0]);
 
-      var chart = d3.select(".chart")
+      var chart1 = d3.select(".chart1")
         .attr("width", width)
         .attr("height", height);
 
       d3.json("eduStatjson.json", function(error, data){
+        x.domain(data.map(function(d){return d.Country;}));
         y.domain([0, d3.max(data, function(d){return d.totHrs;})]);
 
         var barWidth = width / data.length;
 
-        var bar = chart.selectAll("g")
+        var bar = chart1.selectAll("g")
           .data(data)
           .enter().append("g")
           .attr("transform", function(d,i){return "translate(" + i * barWidth +",0)";});
@@ -80,16 +88,56 @@
           .attr("width", (barWidth/2) -1)
           .attr("class", "totalHrs")
           .attr("transform", "translate(" + 2*(barWidth/3) +",0)")
-          .attr("fill", "lightgrey");
-//
-/*        bar.append("text")
-              .attr("x", barWidth/2)
-              .attr("y", height)
-            //  function(d) {
-            //      return y(d.totHrs)+3;})
-              .attr("dy", ".75em")
-              .text(function(d) {return d.Country;});*/
+          .attr("fill", "white");
+      });
 
+      var chart2 = d3.select(".chart2")
+        .attr("width", width)
+        .attr("height", height);
+
+      d3.json("eduStatjson.json", function(error, data){
+        x.domain(data.map(function(d){return d.Country;}));
+        y.domain([0, d3.max(data, function(d){return d.totHrs;})]);
+
+        var barWidth = width / data.length;
+
+        var bar = chart2.selectAll("g")
+          .data(data)
+          .enter().append("g")
+          .attr("transform", function(d,i){return "translate(" + i * barWidth +",0)";});
+
+  //          .attr("transform", "rotate(270)");
+
+  /*bar.append("text")
+        .attr("x", barWidth/2)
+        .attr("y", height)
+      //  function(d) {
+      //      return y(d.totHrs)+3;})
+        .attr("dy", ".75em")
+        .text(function(d) {return d.Country;});*/
+
+        bar.append("rect")
+            .attr("y", function(d) {return y(d.sAvgScr);})
+            .attr("height", function(d) {return height - y(d.sAvgScr);})
+            .attr("width", (barWidth / 3) -1)
+            .attr("class", "mathScr")
+            .attr("fill", "yellow");
+  //
+
+        bar.append("rect")
+          .attr("y", function(d) {return y(d.sHrsPyr);})
+          .attr("height", function(d) {return height - y(d.sHrsPyr);})
+          .attr("width", (barWidth / 3) -1)
+          .attr("class", "mathHoursPerYear")
+          .attr("fill", "green");
+
+        bar.append("rect")
+          .attr("y", function(d) {return y(d.totHrs);})
+          .attr("height", function(d) {return height - y(d.totHrs);})
+          .attr("width", (barWidth/2) -1)
+          .attr("class", "totalHrs")
+          .attr("transform", "translate(" + 2*(barWidth/3) +",0)")
+          .attr("fill", "white");
       });
 
       </script>
