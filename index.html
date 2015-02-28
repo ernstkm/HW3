@@ -9,8 +9,14 @@
       body{
         fill:lightgrey;
       }
-      .chart rect{
+/*      .chart rect{
         fill:steelblue;
+      }*/
+      .mathScr rect{
+        fill:magenta;
+      }
+      .totalHrs rect{
+        fill:green;
       }
       .chart text{
         fill:darkgrey;
@@ -45,25 +51,44 @@
 
   //          .attr("transform", "rotate(270)");
 
+  /*bar.append("text")
+        .attr("x", barWidth/2)
+        .attr("y", height)
+      //  function(d) {
+      //      return y(d.totHrs)+3;})
+        .attr("dy", ".75em")
+        .text(function(d) {return d.Country;});*/
+
         bar.append("rect")
             .attr("y", function(d) {return y(d.mAvgScr);})
             .attr("height", function(d) {return height - y(d.mAvgScr);})
-            .attr("width", (barWidth / 2) -1)
+            .attr("width", (barWidth / 3) -1)
+            .attr("class", "mathScr")
             .attr("fill", "yellow");
   //
 
         bar.append("rect")
-              .attr("y", function(d) {return y(d.totHrs);})
-              .attr("height", function(d) {return height - y(d.totHrs);})
-              .attr("width", (barWidth/2) -1)
-              .attr("transform", "translate(" + (barWidth/2) +",0)");
+          .attr("y", function(d) {return y(d.mHrsPyr);})
+          .attr("height", function(d) {return height - y(d.mHrsPyr);})
+          .attr("width", (barWidth / 3) -1)
+          .attr("class", "mathHoursPerYear")
+          .attr("fill", "green");
+
+        bar.append("rect")
+          .attr("y", function(d) {return y(d.totHrs);})
+          .attr("height", function(d) {return height - y(d.totHrs);})
+          .attr("width", (barWidth/2) -1)
+          .attr("class", "totalHrs")
+          .attr("transform", "translate(" + 2*(barWidth/3) +",0)")
+          .attr("fill", "lightgrey");
 //
-        bar.append("text")
+/*        bar.append("text")
               .attr("x", barWidth/2)
-              .attr("y", function(d) {
-                  return y(d.totHrs)+3;})
+              .attr("y", height)
+            //  function(d) {
+            //      return y(d.totHrs)+3;})
               .attr("dy", ".75em")
-              .text(function(d) {return d.Country;});
+              .text(function(d) {return d.Country;});*/
 
       });
 
