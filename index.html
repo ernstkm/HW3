@@ -15,26 +15,42 @@
         font:10px sans-serif;
         text-anchor: middle;
       }
-      h3, p{
+      h2,h3, p, h4{
         font-family:Helvetica;
         color:grey;
         }
       p{
-        font-size:8px;
+        font-size:10px;
+      }
+      .white{
+        color: white;
+      }
+      .green{
+        color:green;
+      }
+      .yellow{
+        color:yellow;
       }
       </style>
   </head>
   <body>
-    <h3> <em>Flipping the classroom:<br>Do longer school hours mean better scholars?</em></h3>
+    <h2> <em>Flipping the classroom:<br>Do longer school hours mean better scholars?</em></h3>
+    <h3> Let's take a look at fourth-graders around the world as measured by TIMSS. </h3>
+    <h3>Science</h3>
     <svg class="chart1"></svg>
+    <h3>Math</h3>
     <svg class="chart2"></svg>
     <p> Author: Katie Ernst</p>
     <p> Data Source:U.S. Government National Center for Educational Statistics <a href="http://nces.ed.gov/programs/digest/d12/tables/dt12_460.asp">Average fourth--‐grade scores and annual instructional time in mathematics and science, by country or other education system: 2011</a> </p>
     <p> Trends in International Mathematics and Science Study (TIMSS) scores are reported on a scale from 0 to 1,000, with the scale average set at 500 and the standard deviation set at 100.</p>
+
+
       <script type="text/javascript">
-      var width=500;
-      var height = 600;
+
       var barPadding = 1;
+      var margin = {top:5, right: 5, bottom:5, left:40};
+      var width = 600 - margin.left - margin.right;
+      var height = 600 - margin.top - margin.bottom;
 
       var x = d3.scale.ordinal()
         .rangeRoundBands([0,width],.1);
@@ -42,66 +58,44 @@
       var y = d3.scale.linear()
         .range([height,0]);
 
+      var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+      var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
       var chart1 = d3.select(".chart1")
-        .attr("width", width)
-        .attr("height", height);
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       d3.json("eduStatjson.json", function(error, data){
         x.domain(data.map(function(d){return d.Country;}));
         y.domain([0, d3.max(data, function(d){return d.totHrs;})]);
+
+        chart1.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "white")
+          .attr("transform", "rotate(-90)")
+          .attr("y",6)
+          .attr("dy",".71em")
+          .style("text-anchor", "end")
+          .text("Total number hours of classroom instruction per year")
+          .append("text")
+          .attr("transform", "translate(10,0)","rotate(-90)")
+          .attr("y",6)
+          .attr("dy",".71em")
+          .style("text-anchor", "middle")
+          .text("Average Science Score on TIMSS (yellow), Number hours of science instruction per year (green)");
 
         var barWidth = width / data.length;
 
         var bar = chart1.selectAll("g")
-          .data(data)
-          .enter().append("g")
-          .attr("transform", function(d,i){return "translate(" + i * barWidth +",0)";});
-
-  //          .attr("transform", "rotate(270)");
-
-  /*bar.append("text")
-        .attr("x", barWidth/2)
-        .attr("y", height)
-      //  function(d) {
-      //      return y(d.totHrs)+3;})
-        .attr("dy", ".75em")
-        .text(function(d) {return d.Country;});*/
-
-        bar.append("rect")
-            .attr("y", function(d) {return y(d.mAvgScr);})
-            .attr("height", function(d) {return height - y(d.mAvgScr);})
-            .attr("width", (barWidth / 3) -1)
-            .attr("class", "mathScr")
-            .attr("fill", "yellow");
-  //
-
-        bar.append("rect")
-          .attr("y", function(d) {return y(d.mHrsPyr);})
-          .attr("height", function(d) {return height - y(d.mHrsPyr);})
-          .attr("width", (barWidth / 3) -1)
-          .attr("class", "mathHoursPerYear")
-          .attr("fill", "green");
-
-        bar.append("rect")
-          .attr("y", function(d) {return y(d.totHrs);})
-          .attr("height", function(d) {return height - y(d.totHrs);})
-          .attr("width", (barWidth/2) -1)
-          .attr("class", "totalHrs")
-          .attr("transform", "translate(" + 2*(barWidth/3) +",0)")
-          .attr("fill", "white");
-      });
-
-      var chart2 = d3.select(".chart2")
-        .attr("width", width)
-        .attr("height", height);
-
-      d3.json("eduStatjson.json", function(error, data){
-        x.domain(data.map(function(d){return d.Country;}));
-        y.domain([0, d3.max(data, function(d){return d.totHrs;})]);
-
-        var barWidth = width / data.length;
-
-        var bar = chart2.selectAll("g")
           .data(data)
           .enter().append("g")
           .attr("transform", function(d,i){return "translate(" + i * barWidth +",0)";});
@@ -127,6 +121,74 @@
         bar.append("rect")
           .attr("y", function(d) {return y(d.sHrsPyr);})
           .attr("height", function(d) {return height - y(d.sHrsPyr);})
+          .attr("width", (barWidth / 3) -1)
+          .attr("class", "mathHoursPerYear")
+          .attr("fill", "green");
+
+        bar.append("rect")
+          .attr("y", function(d) {return y(d.totHrs);})
+          .attr("height", function(d) {return height - y(d.totHrs);})
+          .attr("width", (barWidth/2) -1)
+          .attr("class", "totalHrs")
+          .attr("transform", "translate(" + 2*(barWidth/3) +",0)")
+          .attr("fill", "white");
+      });
+
+      var chart2 = d3.select(".chart2")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" +margin.left + "," + margin.top + ")");
+
+      d3.json("eduStatjson.json", function(error, data){
+        x.domain(data.map(function(d){return d.Country;}));
+        y.domain([0, d3.max(data, function(d){return d.totHrs;})]);
+
+        chart2.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("fill", "white")
+        .attr("transform", "rotate(-90)")
+        .attr("y",6)
+        .attr("dy",".71em")
+        .style("text-anchor", "end")
+        .text("Total number hours of classroom instruction per year")
+        .append("text")
+        .attr("transform", "translate(10,0)","rotate(-90)")
+        .attr("y",6)
+        .attr("dy",".71em")
+        .style("text-anchor", "middle")
+        .text("Average Math Score on TIMSS (light green), Number hours of math instruction per year (green)");
+
+        var barWidth = width / data.length;
+
+        var bar = chart2.selectAll("g")
+          .data(data)
+          .enter().append("g")
+          .attr("transform", function(d,i){return "translate(" + i * barWidth +",0)";});
+
+  //          .attr("transform", "rotate(270)");
+
+  /*bar.append("text")
+        .attr("x", barWidth/2)
+        .attr("y", height)
+      //  function(d) {
+      //      return y(d.totHrs)+3;})
+        .attr("dy", ".75em")
+        .text(function(d) {return d.Country;});*/
+
+        bar.append("rect")
+            .attr("y", function(d) {return y(d.mAvgScr);})
+            .attr("height", function(d) {return height - y(d.mAvgScr);})
+            .attr("width", (barWidth / 3) -1)
+            .attr("class", "mathScr")
+            .attr("fill", "lightgreen");
+  //
+
+        bar.append("rect")
+          .attr("y", function(d) {return y(d.mHrsPyr);})
+          .attr("height", function(d) {return height - y(d.mHrsPyr);})
           .attr("width", (barWidth / 3) -1)
           .attr("class", "mathHoursPerYear")
           .attr("fill", "green");
